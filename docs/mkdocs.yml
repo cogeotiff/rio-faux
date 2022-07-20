@@ -1,10 +1,10 @@
-site_name: rio-cogeo
-site_description: Cloud Optimized GeoTIFF (COG) creation and validation plugin for Rasterio.
+site_name: rio-faux
+site_description: Create empty image from a model.
 
-repo_name: 'cogeotiff/rio-cogeo'
-repo_url: 'https://github.com/cogeotiff/rio-cogeo'
+repo_name: 'cogeotiff/rio-faux'
+repo_url: 'https://github.com/cogeotiff/rio-faux'
 edit_uri: 'blob/master/docs/docs/'
-site_url: 'https://cogeotiff.github.io/rio-cogeo/'
+site_url: 'https://cogeotiff.github.io/rio-faux/'
 
 extra:
   social:
@@ -17,11 +17,6 @@ extra:
 
 nav:
   - Home: "index.md"
-  - Command-line interface (CLI): "CLI.md"
-  - Application programming interface (API): "API.md"
-  - Advanced Topics: "Advanced.md"
-  - COG Profiles: "profile.md"
-  - How To: "Is_it_a_COG.md"
   - Development - Contributing: "contributing.md"
   - Release Notes: "release-notes.md"
 
