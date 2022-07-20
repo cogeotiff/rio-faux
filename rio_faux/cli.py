@@ -50,12 +50,14 @@ def faux(
     config,
 ):
     """Create Fake copy."""
+    # Check if the dataset has overviews
     with rasterio.open(input) as src_dst:
         ovr = src_dst.overviews(1)
 
+    # Get Overview Blocksize
     overview_blocksize = 512
     if ovr:
-        with rasterio.open(input, OVERVIEW_LEVEL=1) as src_dst:
+        with rasterio.open(input, OVERVIEW_LEVEL=0) as src_dst:
             overview_blocksize = src_dst.profile.get("blockxsize", overview_blocksize)
 
     config.update(
@@ -109,5 +111,17 @@ def faux(
                     )
                     if creation_options:
                         output_profile.update(creation_options)
+
+                    keys = [
+                        "dtype",
+                        "nodata",
+                        "width",
+                        "height",
+                        "count",
+                        "crs",
+                        "transform",
+                    ]
+                    for key in keys:
+                        output_profile.pop(key, None)
 
                     copy(tmp_dst, output, copy_src_overviews=True, **output_profile)

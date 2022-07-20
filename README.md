@@ -44,6 +44,21 @@ $ pip install -U pip
 $ pip install git+https://github.com/cogeotiff/rio-faux.git
 ```
 
+## Usage
+
+```
+$ rio faux --help
+Usage: rio faux [OPTIONS] INPUT OUTPUT
+
+  Create Fake copy.
+
+Options:
+  --forward-band-tags         Forward band tags to output bands.
+  --co, --profile NAME=VALUE  Driver specific creation options. See the documentation for the selected output driver for more information.
+  --config NAME=VALUE         GDAL configuration options.
+  --help                      Show this message and exit.
+```
+
 ## Contribution & Development
 
 See [CONTRIBUTING.md](https://github.com/cogeotiff/rio-faux/blob/master/CONTRIBUTING.md)
