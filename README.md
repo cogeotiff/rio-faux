@@ -1,7 +1,10 @@
 # rio-faux
 
 <p align="center">
-  <em>Create empty image from a model.</em>
+  <img src="https://user-images.githubusercontent.com/10407788/180094114-91b8bb55-022b-4a9d-a1bd-7414037f76fa.png" style="max-width: 800px;" alt="rio-tiler"></a>
+</p>
+<p align="center">
+  <em>Now you can share your dataset!</em>
 </p>
 
 <p align="center">
@@ -30,6 +33,8 @@
 
 ---
 
+Create a copy of your dataset without copying the data.
+
 ## Install
 
 ```bash
@@ -57,6 +62,10 @@ Options:
   --co, --profile NAME=VALUE  Driver specific creation options. See the documentation for the selected output driver for more information.
   --config NAME=VALUE         GDAL configuration options.
   --help                      Show this message and exit.
+```
+
+```
+$ rio faux my_image_i_cant_share.tif public.tif
 ```
 
 ## Contribution & Development
