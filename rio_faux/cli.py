@@ -33,6 +33,12 @@ def has_mask_band(src_dst):
     is_flag=True,
     help="Forward band tags to output bands.",
 )
+@click.option(
+    "--forward-dataset-tags",
+    default=False,
+    is_flag=True,
+    help="Forward dataset tags to output image.",
+)
 @options.creation_options
 @click.option(
     "--config",
@@ -46,6 +52,7 @@ def faux(
     input,
     output,
     forward_band_tags,
+    forward_dataset_tags,
     creation_options,
     config,
 ):
@@ -95,13 +102,17 @@ def faux(
                         )
 
                     indexes = src_dst.indexes
-                    for i, b in enumerate(indexes):
-                        tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
 
-                        if forward_band_tags:
+                    if forward_band_tags:
+                        for i, b in enumerate(indexes):
+                            tmp_dst.set_band_description(
+                                i + 1, src_dst.descriptions[b - 1]
+                            )
                             tmp_dst.update_tags(i + 1, **src_dst.tags(b))
 
-                    tmp_dst.update_tags(**tags)
+                    if forward_dataset_tags:
+                        tmp_dst.update_tags(**tags)
+
                     tmp_dst._set_all_scales([src_dst.scales[b - 1] for b in indexes])
                     tmp_dst._set_all_offsets([src_dst.offsets[b - 1] for b in indexes])
 

@@ -54,3 +54,34 @@ def test_cli(input):
                 faux_p.pop("nodata")
 
             assert src_p == faux_p
+
+
+def test_tags():
+    """Check if tags are forwarded."""
+    runner = CliRunner()
+    src_path = os.path.join(os.path.dirname(__file__), "fixtures", "cog_band_tags.tif")
+    with runner.isolated_filesystem():
+        result = runner.invoke(faux, [src_path, "output.tif"])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+            assert src_dst.profile == faux_dst.profile
+            assert not src_dst.tags() == faux_dst.tags()
+            assert not src_dst.descriptions == faux_dst.descriptions
+            assert not src_dst.tags(0) == faux_dst.tags(0)
+
+        result = runner.invoke(
+            faux,
+            [src_path, "output.tif", "--forward-band-tags", "--forward-dataset-tags"],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+            assert src_dst.profile == faux_dst.profile
+            assert src_dst.tags() == faux_dst.tags()
+            assert src_dst.descriptions == faux_dst.descriptions
+            assert src_dst.tags(0) == faux_dst.tags(0)
