@@ -55,18 +55,21 @@ $ pip install git+https://github.com/cogeotiff/rio-faux.git
 $ rio faux --help
 Usage: rio faux [OPTIONS] INPUT OUTPUT
 
-  Create Fake copy.
+  Create empty copy.
 
 Options:
   --forward-band-tags         Forward band tags to output bands.
+  --forward-dataset-tags      Forward dataset tags to output image.
   --co, --profile NAME=VALUE  Driver specific creation options. See the documentation for the selected output driver for more information.
   --config NAME=VALUE         GDAL configuration options.
   --help                      Show this message and exit.
 ```
 
 ```
-$ rio faux my_image_i_cant_share.tif public.tif
+$ rio faux tests/fixtures/cog_band_tags.tif out.tif
 ```
+![](https://user-images.githubusercontent.com/10407788/180162026-2a023aa9-9c1b-4277-a3c2-c2865d9d7c43.png)
+
 
 ## Contribution & Development
 

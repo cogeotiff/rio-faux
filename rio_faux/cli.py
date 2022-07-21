@@ -56,7 +56,7 @@ def faux(
     creation_options,
     config,
 ):
-    """Create Fake copy."""
+    """Create empty copy."""
     # Check if the dataset has overviews
     with rasterio.open(input) as src_dst:
         ovr = src_dst.overviews(1)
