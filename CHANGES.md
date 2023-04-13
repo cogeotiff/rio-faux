@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.2.1 (2023-04-13)
+
+* Fix issue with CLI path
+* add Alpha band value forwarding
+* add `--value` option to set a custom value in the data
+
 ## 0.2.0 (2022-10-25)
 
 * remove python 3.7 support

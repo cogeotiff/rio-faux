@@ -4,6 +4,7 @@ import os
 import warnings
 
 import click
+import numpy
 import rasterio
 from rasterio.enums import ColorInterp, MaskFlags
 from rasterio.enums import Resampling as ResamplingEnums
@@ -28,6 +29,12 @@ def has_mask_band(src_dst):
 @options.file_in_arg
 @options.file_out_arg
 @click.option(
+    "--value",
+    default=None,
+    type=float,
+    help="Set a custom value in the data.",
+)
+@click.option(
     "--forward-band-tags",
     default=False,
     is_flag=True,
@@ -51,6 +58,7 @@ def has_mask_band(src_dst):
 def faux(
     input,
     output,
+    value,
     forward_band_tags,
     forward_dataset_tags,
     creation_options,
@@ -68,17 +76,20 @@ def faux(
             overview_blocksize = src_dst.profile.get("blockxsize", overview_blocksize)
 
     config.update(
-        dict(
-            GDAL_NUM_THREADS="ALL_CPUS",
-            GDAL_TIFF_INTERNAL_MASK=os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
-            GDAL_TIFF_OVR_BLOCKSIZE=str(overview_blocksize),
-        )
+        {
+            "GDAL_NUM_THREADS": "ALL_CPUS",
+            "GDAL_TIFF_INTERNAL_MASK": os.environ.get("GDAL_TIFF_INTERNAL_MASK", True),
+            "GDAL_TIFF_OVR_BLOCKSIZE": str(overview_blocksize),
+        }
     )
+
     with rasterio.Env(**config):
         with rasterio.open(input) as src_dst:
             meta = src_dst.meta
             with MemoryFile() as m:
                 with m.open(**meta) as tmp_dst:
+                    tmp_dst.colorinterp = src_dst.colorinterp
+
                     if tmp_dst.colorinterp[0] is ColorInterp.palette:
                         try:
                             tmp_dst.write_colormap(1, src_dst.colormap(1))
@@ -90,6 +101,22 @@ def faux(
 
                     if has_mask_band(src_dst):
                         tmp_dst.write_mask(src_dst.dataset_mask())
+
+                    if value:
+                        tmp_dst.write(
+                            numpy.full(
+                                (tmp_dst.count, tmp_dst.height, tmp_dst.width),
+                                value,
+                                dtype=tmp_dst.dtypes[0],
+                            ),
+                        )
+
+                    if ColorInterp.alpha in tmp_dst.colorinterp:
+                        alpha_bidx = src_dst.colorinterp.index(ColorInterp.alpha) + 1
+                        tmp_dst.write(
+                            src_dst.read(indexes=alpha_bidx),
+                            indexes=alpha_bidx,
+                        )
 
                     tags = src_dst.tags()
 
@@ -118,7 +145,7 @@ def faux(
 
                     output_profile = src_dst.profile
                     output_profile.update(
-                        dict(BIGTIFF=os.environ.get("BIGTIFF", "IF_SAFER"))
+                        {"BIGTIFF": os.environ.get("BIGTIFF", "IF_SAFER")}
                     )
                     if creation_options:
                         output_profile.update(creation_options)

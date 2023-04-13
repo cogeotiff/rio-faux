@@ -42,7 +42,7 @@ Source = "https://github.com/cogeotiff/rio-faux"
 Documentation = "https://cogeotiff.github.io/rio-faux/"
 
 [project.entry-points."rasterio.rio_plugins"]
-cogeo = "rio_faux.cli:faux"
+faux = "rio_faux.cli:faux"
 
 [build-system]
 requires = ["flit>=3.2,<4"]
@@ -62,6 +62,17 @@ exclude = [
     "mkdocs.yml",
 ]
 
+[tool.coverage.run]
+branch = true
+parallel = true
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
 [tool.isort]
 profile = "black"
 known_first_party = ["rio_fake"]
@@ -69,9 +80,18 @@ known_third_party = ["rasterio", "click"]
 default_section = "THIRDPARTY"
 
 [tool.mypy]
-no_strict_optional = "True"
-ignore_missing_imports = "True"
+no_strict_optional = true
 
-[tool.pydocstyle]
-select = "D1"
-match = "(?!test).*.py"
+[tool.ruff]
+select = [
+    "D1",  # pydocstyle errors
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "B905",  # ignore zip() without an explicit strict= parameter, only support with python >3.10
+]
