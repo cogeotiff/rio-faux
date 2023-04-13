@@ -3,6 +3,7 @@
 import math
 import os
 
+import numpy
 import pytest
 import rasterio
 from click.testing import CliRunner
@@ -85,3 +86,62 @@ def test_tags():
             assert src_dst.tags() == faux_dst.tags()
             assert src_dst.descriptions == faux_dst.descriptions
             assert src_dst.tags(0) == faux_dst.tags(0)
+
+
+def test_alpha():
+    """Check if alpha forwarded."""
+    runner = CliRunner()
+    src_path = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
+    with runner.isolated_filesystem():
+        result = runner.invoke(faux, [src_path, "output.tif"])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+            assert src_dst.colorinterp == faux_dst.colorinterp
+            numpy.testing.assert_array_equal(
+                src_dst.read(indexes=4), faux_dst.read(indexes=4)
+            )
+
+
+def test_mask():
+    """Check if alpha forwarded."""
+    runner = CliRunner()
+    src_path = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgb_mask.tif")
+    with runner.isolated_filesystem():
+        result = runner.invoke(faux, [src_path, "output.tif"])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+            assert src_dst.mask_flag_enums == faux_dst.mask_flag_enums
+            numpy.testing.assert_array_equal(
+                src_dst.dataset_mask(), faux_dst.dataset_mask()
+            )
+
+
+def test_value():
+    """Check value."""
+    runner = CliRunner()
+    src_path = os.path.join(os.path.dirname(__file__), "fixtures", "image_rgba.tif")
+    with runner.isolated_filesystem():
+        result = runner.invoke(faux, [src_path, "output.tif", "--value", 100])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+
+            assert numpy.unique(faux_dst.read(indexes=1)) == 100
+
+        # Check that we are casting values to the output data type
+        result = runner.invoke(faux, [src_path, "output.tif", "--value", 100.3])
+        assert not result.exception
+        assert result.exit_code == 0
+        with rasterio.open(src_path) as src_dst, rasterio.open(
+            "output.tif"
+        ) as faux_dst:
+
+            assert numpy.unique(faux_dst.read(indexes=1)) == 100
