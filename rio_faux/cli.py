@@ -130,9 +130,11 @@ def faux(
 
                     indexes = src_dst.indexes
 
-                    for i, b in enumerate(indexes):
-                        tmp_dst.set_band_description(i + 1, src_dst.descriptions[b - 1])
-                        if forward_band_tags:
+                    if forward_band_tags:
+                        for i, b in enumerate(indexes):
+                            tmp_dst.set_band_description(
+                                i + 1, src_dst.descriptions[b - 1]
+                            )
                             tmp_dst.update_tags(i + 1, **src_dst.tags(b))
 
                     if forward_dataset_tags:
